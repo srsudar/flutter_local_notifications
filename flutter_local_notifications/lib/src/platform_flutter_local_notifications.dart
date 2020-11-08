@@ -84,6 +84,9 @@ class AndroidFlutterLocalNotificationsPlugin
 
   /// Schedules a notification to be shown at the specified date and time.
   ///
+  /// The device's local timezone is used to schedule the notification. If you
+  /// need to specify another timezone, use zonedSchedule instead.
+  ///
   /// The [androidAllowWhileIdle] parameter determines if the notification
   /// should still be shown at the exact time when the device is in a low-power
   /// idle mode.
@@ -99,17 +102,29 @@ class AndroidFlutterLocalNotificationsPlugin
     bool androidAllowWhileIdle = false,
   }) async {
     validateId(id);
-    final Map<String, Object> serializedPlatformSpecifics =
-        notificationDetails?.toMap() ?? <String, Object>{};
-    serializedPlatformSpecifics['allowWhileIdle'] = androidAllowWhileIdle;
-    await _channel.invokeMethod('schedule', <String, Object>{
-      'id': id,
-      'title': title,
-      'body': body,
-      'millisecondsSinceEpoch': scheduledDate.millisecondsSinceEpoch,
-      'platformSpecifics': serializedPlatformSpecifics,
-      'payload': payload ?? ''
-    });
+
+    final String localTimeZone =
+        await _channel.invokeMethod('getLocalTimeZone');
+    initializeTimeZones();
+    setLocalLocation(getLocation(localTimeZone));
+    TZDateTime tzScheduledDate = TZDateTime(
+        getLocation(localTimeZone),
+        scheduledDate.year,
+        scheduledDate.month,
+        scheduledDate.day,
+        scheduledDate.hour,
+        scheduledDate.minute,
+        scheduleDate.second);
+
+    zonedSchedule(
+      id,
+      title,
+      body,
+      tzScheduledDate,
+      notificationDetails,
+      androidAllowWhileIdle: androidAllowWhileIdle,
+      payload: payload ?? '',
+    );
   }
 
   /// Schedules a notification to be shown at the specified date and time

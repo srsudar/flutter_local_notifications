@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -102,6 +103,7 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
     private static final String SHOW_DAILY_AT_TIME_METHOD = "showDailyAtTime";
     private static final String SHOW_WEEKLY_AT_DAY_AND_TIME_METHOD = "showWeeklyAtDayAndTime";
     private static final String GET_NOTIFICATION_APP_LAUNCH_DETAILS_METHOD = "getNotificationAppLaunchDetails";
+    private static final String GET_LOCAL_TIME_ZONE_METHOD = "getLocalTimeZone";
     private static final String METHOD_CHANNEL = "dexterous.com/flutter/local_notifications";
     private static final String PAYLOAD = "payload";
     private static final String INVALID_ICON_ERROR_CODE = "INVALID_ICON";
@@ -950,6 +952,9 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
             case GET_ACTIVE_NOTIFICATIONS_METHOD:
                 getActiveNotifications(result);
                 break;
+            case GET_LOCAL_TIME_ZONE_METHOD:
+                getLocalTimeZone(result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -1005,6 +1010,10 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
             zonedScheduleNotification(applicationContext, notificationDetails, true);
             result.success(null);
         }
+    }
+
+    private void getLocalTimeZone(MethodCall call, Result result) {
+        result.success(TimeZone.getDefault().id);
     }
 
     private void show(MethodCall call, Result result) {

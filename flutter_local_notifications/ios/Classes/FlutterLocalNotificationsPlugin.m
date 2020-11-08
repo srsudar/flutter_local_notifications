@@ -29,6 +29,7 @@ NSString *const CALLBACK_CHANNEL = @"dexterous.com/flutter/local_notifications_b
 NSString *const ON_NOTIFICATION_METHOD = @"onNotification";
 NSString *const DID_RECEIVE_LOCAL_NOTIFICATION = @"didReceiveLocalNotification";
 NSString *const REQUEST_PERMISSIONS_METHOD = @"requestPermissions";
+NSString *const GET_LOCAL_TIME_ZONE_METHOD = @"getLocalTimeZone";
 
 NSString *const DAY = @"day";
 
@@ -149,10 +150,18 @@ static FlutterError *getFlutterError(NSError *error) {
         result(notificationAppLaunchDetails);
     } else if([PENDING_NOTIFICATIONS_REQUESTS_METHOD isEqualToString:call.method]) {
         [self pendingNotificationRequests:result];
+    } else if([GET_LOCAL_TIME_ZONE_METHOD isEqualToString:call.method]) {
+        [self getLocalTimeZone:result];
     }
     else {
         result(FlutterMethodNotImplemented);
     }
+}
+
+- (void)getLocalTimeZone:(FlutterResult _Nonnull)result {
+    NSTimeZone *timeZone = [NSTimeZone localTimeZone];
+    NSString *timeZoneName = [timeZone name];
+    result(tzName);
 }
 
 - (void)pendingUserNotificationRequests:(FlutterResult _Nonnull)result NS_AVAILABLE_IOS(10.0) {
